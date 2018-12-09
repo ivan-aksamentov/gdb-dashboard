@@ -433,8 +433,12 @@ class Dashboard(gdb.Command):
     @staticmethod
     def get_term_width(fd=1):  # defaults to the main terminal
         # first 2 shorts (4 byte) of struct winsize
-        raw = fcntl.ioctl(fd, termios.TIOCGWINSZ, ' ' * 4)
-        height, width = struct.unpack('hh', raw)
+        if os.isatty(fd):
+            raw = fcntl.ioctl(fd, termios.TIOCGWINSZ, ' ' * 4)
+            _, width = struct.unpack('hh', raw)
+        else:
+            width = 80
+
         return int(width)
 
     @staticmethod
